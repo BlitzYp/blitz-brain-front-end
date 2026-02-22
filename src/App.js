@@ -133,7 +133,7 @@ class App extends Component {
       return;
     }
     this.setState({ imageUrl: this.state.input, box: {}, detectionMessage: "" });
-    fetch("http://localhost:3000/imageurl", {
+    fetch("https://blitz-brain-backend.onrender.com/imageurl", {
       method: "post",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({
@@ -145,7 +145,7 @@ class App extends Component {
         const box = this.calculateFaceLocation(response);
 
         if (response) {
-          fetch("http://localhost:3000/image", {
+          fetch("https://blitz-brain-backend.onrender.com/image", {
             method: "put",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify({
@@ -191,7 +191,7 @@ class App extends Component {
     }
     this.setState({ route: route })
   }
-
+  
   render() {
     const { isSignedIn, imageUrl, route, box, detectionMessage } = this.state;
     return (

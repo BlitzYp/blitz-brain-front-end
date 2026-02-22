@@ -16,8 +16,8 @@ class Signin extends React.Component {
         this.setState({ signInPassword: event.target.value })
     }
     onSubmitSignIn = () => {
-        console.log(this.state);
-        fetch("http://localhost:3000/signin", {
+        //console.log(this.state);
+        fetch("https://blitz-brain-backend.onrender.com/signin", {
             method: "post",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify({
