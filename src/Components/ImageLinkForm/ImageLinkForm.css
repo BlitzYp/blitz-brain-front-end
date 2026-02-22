@@ -1,5 +1,6 @@
 .form {
     width: 700px;
+    max-width: 92vw;
     background:
     radial-gradient(circle farthest-side at 0% 50%,#fb1 23.5%,rgba(240,166,17,0) 0)21px 30px,
     radial-gradient(circle farthest-side at 0% 50%,#B71 24%,rgba(240,166,17,0) 0)19px 30px,
@@ -8,4 +9,121 @@
     linear-gradient(30deg,#fb1 24%,#B71 0,#B71 26%,rgba(240,166,17,0) 0,rgba(240,166,17,0) 74%,#B71 0,#B71 76%,#fb1 0)0 0,
     linear-gradient(90deg,#B71 2%,#fb1 0,#fb1 98%,#B71 0%)0 0 #fb1;
     background-size: 40px 60px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.input-mode {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.6rem;
+    padding: 0.9rem;
+}
+
+.input-mode-url {
+    box-shadow: inset 0 0 0 1px rgba(60, 120, 255, 0.08);
+}
+
+.input-mode-file {
+    box-shadow: inset 0 0 0 1px rgba(26, 125, 78, 0.08);
+}
+
+.mode-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+.url-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: stretch;
+}
+
+.url-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 2px solid #d1d5db;
+    border-radius: 0.45rem;
+    background: #fff;
+}
+
+.url-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.detect-button {
+    min-width: 120px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.45rem;
+    font-weight: 700;
+}
+
+.mode-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.8rem 0;
+    color: #5b4636;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+}
+
+.mode-divider::before,
+.mode-divider::after {
+    content: "";
+    height: 1px;
+    background: rgba(0, 0, 0, 0.18);
+    flex: 1;
+}
+
+.mode-divider span {
+    margin: 0 0.75rem;
+    background: rgba(255, 255, 255, 0.35);
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+}
+
+.file-picker {
+    display: block;
+    border: 2px dashed #1a7d4e;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 0.55rem;
+    padding: 0.8rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.file-picker:hover {
+    background: rgba(232, 255, 243, 0.9);
+}
+
+.file-picker-label {
+    display: block;
+    font-weight: 600;
+    color: #14532d;
+    margin-bottom: 0.4rem;
+}
+
+.file-input {
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.file-help {
+    font-size: 0.8rem;
+    color: #374151;
+}
+
+@media screen and (max-width: 700px) {
+    .url-row {
+        flex-direction: column;
+    }
+
+    .detect-button {
+        width: 100%;
+    }
 }

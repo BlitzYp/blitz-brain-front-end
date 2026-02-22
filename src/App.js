@@ -26,6 +26,7 @@ const initialState = {
   input: "",
   imageUrl: "",
   box: {},
+  detectionMessage: "",
   route: "signin",
   isSignedIn: false,
   user: {
@@ -45,6 +46,7 @@ class App extends Component {
       input: "",
       imageUrl: "",
       box: {},
+      detectionMessage: "",
       route: "signin",
       isSignedIn: false,
       user: {
@@ -72,8 +74,23 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
+    const clarifaiFace = data &&
+      data.outputs &&
+      data.outputs[0] &&
+      data.outputs[0].data &&
+      data.outputs[0].data.regions &&
+      data.outputs[0].data.regions[0] &&
+      data.outputs[0].data.regions[0].region_info &&
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+
+    if (!clarifaiFace) {
+      return null;
+    }
+
     const image = document.getElementById("inputImage");
+    if (!image) {
+      return null;
+    }
     const width = Number(image.width);
     const height = Number(image.height);
     return {
@@ -89,12 +106,34 @@ class App extends Component {
   }
 
   onInputChange = (event) => {
-    this.setState({ input: event.target.value });
+    this.setState({ input: event.target.value, box: {}, detectionMessage: "" });
+  }
+
+  onFileChange = (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.setState({
+        input: reader.result,
+        imageUrl: reader.result,
+        box: {},
+        detectionMessage: ""
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   onButtonSubmit = () => {
-    this.setState({ imageUrl: this.state.input })
-    fetch("https://warm-citadel-29259.herokuapp.com/imageurl", {
+    if (!this.state.input) {
+      this.setState({ detectionMessage: "Please enter an image URL or choose a file first." });
+      return;
+    }
+    this.setState({ imageUrl: this.state.input, box: {}, detectionMessage: "" });
+    fetch("http://localhost:3000/imageurl", {
       method: "post",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({
@@ -103,8 +142,10 @@ class App extends Component {
     })
       .then(response => response.json())
       .then(response => {
+        const box = this.calculateFaceLocation(response);
+
         if (response) {
-          fetch("https://warm-citadel-29259.herokuapp.com/image", {
+          fetch("http://localhost:3000/image", {
             method: "put",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify({
@@ -113,18 +154,37 @@ class App extends Component {
           })
             .then(response => response.json())
             .then(count => {
-              this.setState({ user: Object.assign(this.state.user, { entries: count }) })
+              const nextEntries =
+                count && typeof count === "object" ? count.entries : count;
+
+              this.setState((prevState) => ({
+                user: {
+                  ...prevState.user,
+                  entries: nextEntries
+                }
+              }))
             })
             .catch(console.log)
         }
-        this.displayFaceBox(this.calculateFaceLocation(response))
+        if (!box) {
+          this.displayFaceBox({});
+          this.setState({ detectionMessage: "No face detected in that image. Try another image." });
+          return;
+        }
+
+        this.displayFaceBox(box)
+        this.setState({ detectionMessage: "" });
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        this.setState({ detectionMessage: "Unable to process that image right now. Please try again." });
+      });
   }
 
   onRouteChange = (route) => {
     if (route === "signout") {
-      this.setState({ initialState })
+      this.setState(initialState)
+      return;
     }
     else if (route === "home") {
       this.setState({ isSignedIn: true })
@@ -133,7 +193,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, box, detectionMessage } = this.state;
     return (
       <div className="App">
         <Particles className="particles"
@@ -144,7 +204,14 @@ class App extends Component {
           ? <div>
             <Logo />
             <Rank name={this.state.user.name} entries={this.state.user.entries} />
-            <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+            <ImageLinkForm
+              onInputChange={this.onInputChange}
+              onFileChange={this.onFileChange}
+              onButtonSubmit={this.onButtonSubmit}
+            />
+            {detectionMessage && (
+              <p className="white f5 mt3 mb2">{detectionMessage}</p>
+            )}
             <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
           : (
